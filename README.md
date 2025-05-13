@@ -16,9 +16,9 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# 欢迎来到 智言平台
+# 欢迎来到 DeepSleep
 
-智言平台 是一个开源的智能体交流与开发平台，让更多的AIGC爱好者更好的了解Agent
+DeepSleep 是一个开源的智能体交流与开发平台，让更多的AIGC爱好者更好的了解Agent
 
 ## 成果图
 ### 智言平台首页

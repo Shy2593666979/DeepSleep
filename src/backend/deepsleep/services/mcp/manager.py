@@ -5,7 +5,7 @@ from deepsleep.services.mcp.multi_client import MultiServerMCPClient
 from loguru import logger
 
 class MCPManager:
-    def __init__(self, timeout):
+    def __init__(self, timeout=10):
         self.multi_server_client = MultiServerMCPClient()
 
         self.timeout = timeout
@@ -59,9 +59,9 @@ class MCPManager:
                 tool_list = []
                 for tool in tools:
                     # TODO: 基于LangChain的Tool Sdk修改，提取schema交给frontend
-                    args_schema = tool.args_schema.model_json_schema()
-                    input_schema = args_schema["properties"]["input_schema"]["default"]
-
+                    # args_schema = tool.args_schema.model_json_schema()
+                    # input_schema = args_schema["properties"]["input_schema"]["default"]
+                    input_schema = tool.args_schema
                     tool_dict = {
                         'name': tool.name,
                         'description': tool.description,

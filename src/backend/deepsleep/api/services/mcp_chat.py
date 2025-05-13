@@ -1,7 +1,7 @@
 import asyncio
 
 from deepsleep.api.services.history import HistoryService
-from deepsleep.api.services.mcp_server import MCPServerService
+from deepsleep.api.services.mcp_stdio_server import MCPServerService
 from deepsleep.services.mcp_openai.mcp_manager import MCPManager
 from deepsleep.core.models.anthropic import DeepAsyncAnthropic
 from deepsleep.api.services.llm import LLMService

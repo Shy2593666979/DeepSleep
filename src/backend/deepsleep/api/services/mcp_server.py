@@ -1,47 +1,56 @@
 from deepsleep.database.dao.mcp_server import MCPServerDao
-from deepsleep.database.models.user import AdminUser
-from loguru import logger
+from deepsleep.database.models.user import AdminUser, SystemUser
 
-class MCPServerService:
 
-    @classmethod
-    def create_mcp_server(cls, name: str, mcp_server_path: str,
-                          user_id: str, mcp_server_command: str, mcp_server_env: str):
-        return MCPServerDao.create_mcp_server(mcp_server_path, mcp_server_command, user_id, name, mcp_server_env)
+class MCPService:
 
     @classmethod
-    def get_mcp_servers(cls, user_id):
-        mcp_servers = MCPServerDao.get_mcp_servers(user_id)
-        results = []
-        for server in mcp_servers:
-            results.append(server[0])
-        return results
+    def create_mcp_server(cls, mcp_server_name: str, user_id: str, user_name: str,
+                          url: str, type: str, config: str, tools: str, params: dict):
+        try:
+            return MCPServerDao.create_mcp_server(mcp_server_name, user_id, user_name, url, type,
+                                                  config, tools, params)
+        except Exception as err:
+            raise ValueError(f"Create MCP Server Error: {err}")
 
     @classmethod
-    def delete_mcp_server(cls, user_id, mcp_server_id):
-        mcp_server_user = cls.get_mcp_server_user(mcp_server_id)
-        if user_id in (mcp_server_user, AdminUser):
+    def get_mcp_server_from_id(cls, mcp_server_id):
+        try:
+            return MCPServerDao.get_mcp_server_from_id(mcp_server_id)
+        except Exception as err:
+            raise ValueError(f"Get MCP Server From ID Error: {err}")
+
+    @classmethod
+    def update_mcp_server(cls, mcp_server_id: str, mcp_server_name: str,
+                          url: str, type: str, config: str, tools: str, params: dict):
+        try:
+            return MCPServerDao.update_mcp_server(mcp_server_id, mcp_server_name, url, type, config,
+                                                  tools, params)
+        except Exception as err:
+            raise ValueError(f"Update MCP Server Error: {err}")
+
+    @classmethod
+    def get_server_from_tool_name(cls, tool_name):
+        try:
+            results = MCPServerDao.get_server_from_tool_name(tool_name)
+            return [res.to_dict() for res in results]
+        except Exception as err:
+            raise ValueError(f"Get Server From Tool Name Error: {err}")
+
+    @classmethod
+    def delete_server_from_id(cls, mcp_server_id):
+        try:
             return MCPServerDao.delete_mcp_server(mcp_server_id)
-        else:
-            logger.error("No Permission Exec Delete MCP Server")
-            raise ValueError("No Permission Exec Delete MCP Server")
+        except Exception as err:
+            raise ValueError(f"Delete Server From ID Error: {err}")
 
     @classmethod
-    def update_mcp_server(cls, mcp_server_id, mcp_server_path, name,
-                          user_id, mcp_server_command, mcp_server_env):
-        mcp_server_user = cls.get_mcp_server_user(mcp_server_id)
-        if user_id in (mcp_server_user, AdminUser):
-           return MCPServerDao.update_mcp_server(mcp_server_id, mcp_server_path, mcp_server_command, name, mcp_server_env)
-        else:
-            logger.error("No Permission Exec Update MCP Server")
-            raise ValueError("No Permission Exec Update MCP Server")
+    def get_all_servers(cls, user_id):
+        try:
+            personal_servers = MCPServerDao.get_mcp_servers(user_id)
+            admin_servers = MCPServerDao.get_mcp_servers(SystemUser)
+            all_servers = personal_servers + admin_servers
 
-    @classmethod
-    def get_mcp_server_user(cls, mcp_server_id):
-        mcp_server = MCPServerDao.get_mcp_server_by_id(mcp_server_id)
-        return mcp_server[0].user_id
-
-    @classmethod
-    def get_mcp_server_from_id(cls, server_id):
-        mcp_server = MCPServerDao.get_mcp_server_by_id(server_id)
-        return mcp_server[0].to_dict()
+            return [server.to_dict() for server in all_servers]
+        except Exception as err:
+            raise ValueError(f"Get All Servers Error: {err}")

@@ -15,7 +15,7 @@ from deepsleep.services.rag_handler import RagHandler
 from deepsleep.tools import action_Function_call, action_React
 from deepsleep.api.services.llm import LLMService
 from deepsleep.services.mcp.manager import MCPManager
-from deepsleep.api.services.mcp_server import MCPServerService
+from deepsleep.api.services.mcp_stdio_server import MCPServerService
 from loguru import logger
 import inspect
 import json
@@ -32,6 +32,7 @@ class ChatService:
         self.knowledges_id = kwargs.get('knowledge_id')
         self.mcp_manager = MCPManager(timeout=10)
         self.llm_call = None
+        self.mcp_tools = None
         self.llm = None
         self.embedding = None
         self.tools = []
@@ -69,7 +70,7 @@ class ChatService:
 
     async def setup_mcp_tools(self):
         mcp_tools = await self.mcp_manager.get_mcp_tools()
-        return mcp_tools
+        self.mcp_tools = mcp_tools
 
     async def setup_tools(self):
         tools_name = ToolService.get_tool_name_by_id(self.tools_id)
@@ -107,17 +108,34 @@ class ChatService:
 
     async def _run_function_call(self, user_input: str, history_message: str, recall_knowledge_text: str):
 
-        func_prompt = function_call_template.format(input=user_input, history=history_message, recall_knowledge_text=recall_knowledge_text)
-        fun_name, args = self._function_call(user_input=func_prompt)
+        # 并发执行不同类型的工具
+        tools_result, mcp_tools_result = asyncio.gather(
+            self.call_common_tool(user_input, history_message),
+            self.call_mcp_tool(user_input, history_message)
+        )
 
-        tools_result = ChatService._exec_tools(fun_name, args)
+
         prompt_template = PromptTemplate.from_template(function_call_prompt)
 
         chain = prompt_template | self.llm
-        async for chunk in chain.astream({'input': user_input, 'history': history_message, 'tools_result': tools_result}):
+        async for chunk in chain.astream({'input': user_input, 'history': history_message, 'tools_result': tools_result, "mcp_tools_result": mcp_tool_result, "knowledge_result": recall_knowledge_text}):
             yield chunk.json(ensure_ascii=False, include=INCLUDE_MSG)
 
-    def _function_call(self, user_input: str):
+    async def call_common_tool(self, user_input, history_message):
+        # 普通的插件调用
+        func_prompt = function_call_template.format(input=user_input, history=history_message)
+        fun_name, args = await self._function_call(user_input=func_prompt)
+        tools_result = self.exec_tools(fun_name, args)
+        return tools_result
+
+    async def call_mcp_tool(self, user_input, history_message):
+        # MCP 插件调用
+        mcp_tool_prompt = function_call_template.format(input=user_input, history=history_message)
+        mcp_tool_name, mcp_tool_args = await self._mcp_function_call(user_input=mcp_tool_prompt)
+        mcp_tool_result = self.exec_mcp_tools(mcp_tool_name, mcp_tool_args)
+        return mcp_tool_result
+
+    async def _function_call(self, user_input: str):
         messages = [HumanMessage(content=user_input)]
         message = self.llm.invoke(
             messages,
@@ -134,8 +152,32 @@ class ChatService:
             logger.info(f"function call is not appear: {err}")
             return None, None
 
-    @staticmethod
-    def _exec_tools(func_name, args):
+    async def _mcp_function_call(self, user_input: str):
+        messages = [HumanMessage(content=user_input)]
+        message = self.llm.invoke(
+            messages,
+            functions=self.mcp_tools,
+        )
+        try:
+            if message.additional_kwargs:
+                function_name = message.additional_kwargs["function_call"]["name"]
+                arguments = json.loads(message.additional_kwargs["function_call"]["arguments"])
+
+                logger.info(f"function call result: \n function_name: {function_name} \n arguments: {arguments}")
+                return function_name, arguments
+        except Exception as err:
+            logger.info(f"function call is not appear: {err}")
+            return None, None
+
+    async def exec_mcp_tools(self, mcp_tool_name, mcp_tool_args):
+        mcp_tools_info = {
+            "tool_name": mcp_tool_name,
+            "tool_args": mcp_tool_args
+        }
+        mcp_tool_results = self.mcp_manager.call_mcp_tools([mcp_tools_info])
+        return mcp_tool_results
+
+    async def exec_tools(self, func_name, args):
         try:
             action = action_Function_call[func_name]
             result = action(**args)

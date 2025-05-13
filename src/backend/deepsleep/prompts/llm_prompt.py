@@ -4,6 +4,8 @@ function_call_prompt = """
 1. **用户输入**: {input}
 2. **历史记录**: {history}
 3. **工具结果**: {tools_result}
+4. **MCP工具结果**: {mcp_tools_result}
+5. **知识库召回信息**: {knowledge_result}
 
 请根据以上信息，生成一个全面且有针对性的响应或建议。
 """

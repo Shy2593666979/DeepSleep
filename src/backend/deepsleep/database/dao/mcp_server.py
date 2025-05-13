@@ -4,32 +4,27 @@ from sqlmodel import Session
 from sqlalchemy import select, and_, update, desc, delete, or_
 from deepsleep.database import engine
 
-from deepsleep.database.models.mcp_server import MCPServerTable
+from deepsleep.database.models.mcp_server import MCPServerStdioTable, MCPServerTable
 
 
 class MCPServerDao:
-
     @classmethod
-    def create_mcp_server(cls, mcp_server_path: str, mcp_server_command: str,
-                          user_id: str, name: str, mcp_server_env: str):
+    def create_mcp_server(cls, mcp_server_name: str, user_id: str, user_name: str,
+                          url: str, type: str, config: str, tools: str, params: dict):
         with Session(engine) as session:
-            mcp_server = MCPServerTable(user_id=user_id,
-                                        name=name,
-                                        mcp_server_env=mcp_server_env,
-                                        mcp_server_path=mcp_server_path,
-                                        mcp_server_command=mcp_server_command)
+            mcp_server = MCPServerTable(mcp_server_name=mcp_server_name, user_id=user_id,
+                                        user_name=user_name, url=url, type=type, config=config,
+                                        tools=tools, params=params)
             session.add(mcp_server)
             session.commit()
 
+
     @classmethod
-    def get_mcp_servers(cls, user_id):
+    def get_mcp_server_from_id(cls, mcp_server_id):
         with Session(engine) as session:
-            if user_id:
-                sql = select(MCPServerTable).where(MCPServerTable.user_id == user_id)
-            else:
-                sql = select(MCPServerTable)
-            mcp_servers = session.exec(sql).all()
-            return mcp_servers
+            sql = select(MCPServerTable).where(MCPServerTable.mcp_server_id == mcp_server_id)
+            results = session.exec(sql).all()
+            return results
 
     @classmethod
     def delete_mcp_server(cls, mcp_server_id):
@@ -39,28 +34,40 @@ class MCPServerDao:
             session.commit()
 
     @classmethod
-    def update_mcp_server(cls, mcp_server_id: str, mcp_server_path: str,
-                          mcp_server_command: str, name: str, mcp_server_env: str):
+    def update_mcp_server(cls, mcp_server_id: str, mcp_server_name: str,
+                          url: str, type: str, config: str, tools: str, params: dict):
         with Session(engine) as session:
             update_values = {
-                'create_time': datetime.utcnow()
+                'update_time': datetime.utcnow()
             }
-            if mcp_server_env:
-                update_values["mcp_server_env"] = mcp_server_env
-            if mcp_server_path:
-                update_values["mcp_server_path"] = mcp_server_path
-            if mcp_server_command:
-                update_values["mcp_server_command"] = mcp_server_command
-            if name:
-                update_values["name"] = name
+            if mcp_server_name:
+                update_values["mcp_server_name"] = mcp_server_name
+            if url:
+                update_values["url"] = url
+            if type:
+                update_values["type"] = type
+            if config:
+                update_values["config"] = config
+            if tools:
+                update_values["tools"] = tools
+            if params:
+                update_values["params"] = params
 
             sql = update(MCPServerTable).where(MCPServerTable.mcp_server_id == mcp_server_id).values(**update_values)
             session.exec(sql)
             session.commit()
 
     @classmethod
-    def get_mcp_server_by_id(cls, mcp_server_id):
+    def get_server_from_tool_name(cls, tool_name):
         with Session(engine) as session:
-            sql = select(MCPServerTable).where(MCPServerTable.mcp_server_id == mcp_server_id)
-            mcp_server = session.exec(sql).all()
-            return mcp_server
+            sql = select(MCPServerTable).where(MCPServerTable.tools.contains(tool_name))
+            results = session.exec(sql).all()
+            return results
+
+
+    @classmethod
+    def get_mcp_servers(cls, user_id):
+        with Session(engine) as session:
+            sql = select(MCPServerTable).where(MCPServerTable.user_id == user_id)
+            results = session.exec(sql).all()
+            return results
