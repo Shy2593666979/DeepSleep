@@ -116,5 +116,4 @@ class MCPManager:
             logger.error(f"调用工具发生错误：{err}")
         finally:
             await self.multi_server_client.aclose()
-
         return tool_results

@@ -22,6 +22,9 @@ import json
 
 INCLUDE_MSG = {"content", "id"}
 
+FUNCTION_CALL_MSG = "Function Call"
+REACT_MSG = "React"
+
 class ChatService:
     def __init__(self, **kwargs):
         self.llm_id = kwargs.get('llm_id')
@@ -49,7 +52,7 @@ class ChatService:
         self.llm = ChatOpenAI(model=llm_config.model,
                               base_url=llm_config.base_url, api_key=llm_config.api_key)
 
-        self.llm_call = 'Function Call' if llm_config.model in Function_Call_provider else 'React'
+        self.llm_call = FUNCTION_CALL_MSG if llm_config.model in Function_Call_provider else REACT_MSG
         # Agent支持Embedding后初始化
         if self.embedding_id:
             await self.init_embedding()
@@ -74,7 +77,7 @@ class ChatService:
 
     async def setup_tools(self):
         tools_name = ToolService.get_tool_name_by_id(self.tools_id)
-        if self.llm_call == 'React':
+        if self.llm_call == REACT_MSG:
             for name in tools_name:
                 func = action_React[name]
                 self.tools.append(ChatService.function_to_json(func))
@@ -118,7 +121,7 @@ class ChatService:
         prompt_template = PromptTemplate.from_template(function_call_prompt)
 
         chain = prompt_template | self.llm
-        async for chunk in chain.astream({'input': user_input, 'history': history_message, 'tools_result': tools_result, "mcp_tools_result": mcp_tool_result, "knowledge_result": recall_knowledge_text}):
+        async for chunk in chain.astream({'input': user_input, 'history': history_message, 'tools_result': tools_result, "mcp_tools_result": mcp_tools_result, "knowledge_result": recall_knowledge_text}):
             yield chunk.json(ensure_ascii=False, include=INCLUDE_MSG)
 
     async def call_common_tool(self, user_input, history_message):
@@ -146,10 +149,12 @@ class ChatService:
                 function_name = message.additional_kwargs["function_call"]["name"]
                 arguments = json.loads(message.additional_kwargs["function_call"]["arguments"])
 
-                logger.info(f"function call result: \n function_name: {function_name} \n arguments: {arguments}")
+                logger.info(f"Function call result: \n function_name: {function_name} \n arguments: {arguments}")
                 return function_name, arguments
+            else:
+                raise ValueError
         except Exception as err:
-            logger.info(f"function call is not appear: {err}")
+            logger.info(f"Function call is not appear: {err}")
             return None, None
 
     async def _mcp_function_call(self, user_input: str):
@@ -163,10 +168,12 @@ class ChatService:
                 function_name = message.additional_kwargs["function_call"]["name"]
                 arguments = json.loads(message.additional_kwargs["function_call"]["arguments"])
 
-                logger.info(f"function call result: \n function_name: {function_name} \n arguments: {arguments}")
+                logger.info(f"Function call result: \n function_name: {function_name} \n arguments: {arguments}")
                 return function_name, arguments
+            else:
+                raise ValueError
         except Exception as err:
-            logger.info(f"function call is not appear: {err}")
+            logger.info(f"Function call is not appear: {err}")
             return None, None
 
     async def exec_mcp_tools(self, mcp_tool_name, mcp_tool_args):
