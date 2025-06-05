@@ -14,6 +14,8 @@ AdminUser = '1'
 
 
 class UserTable(SQLModel, table=True):
+    __tablename__ = "user"
+
     user_id: str = Field(primary_key=True)
     user_name: str = Field(index=True, unique=True)
     user_email: str = Field(default=None)

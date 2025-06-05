@@ -5,9 +5,12 @@ from datetime import datetime
 from uuid import uuid4
 from sqlalchemy import JSON, Column
 
+from deepsleep.database.models.base import SQLModelSerializable
 
 
-class KnowledgeTable(SQLModel, table=True):
+class KnowledgeTable(SQLModelSerializable, table=True):
+    __tablename__ = "knowledge"
+
     id: str = Field(default_factory=lambda: uuid4().hex, primary_key=True)
     name: str = Field(index=True)
     description: Optional[str] = Field(index=True)

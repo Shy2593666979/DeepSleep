@@ -8,8 +8,8 @@ class CrawlWebInput(BaseModel):
     web_url: str = Field(description='想要爬取内容的网页地址')
 
 class CrawlWebTool(BaseTool):
-    name = 'crawl_web'
-    description = '帮助用户爬取网页的内容信息'
+    name: str = 'crawl_web'
+    description: str = '帮助用户爬取网页的内容信息'
     args_schema: Type[BaseModel] = CrawlWebInput
 
     def _run(self, web_url: str):

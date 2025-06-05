@@ -1,7 +1,7 @@
 import json
 
 from loguru import logger
-from deepsleep.core.models import AsyncChatClient
+from deepsleep.core.models.models import AsyncChatClient
 from deepsleep.settings import app_settings
 from deepsleep.prompts.system import system_query_rewrite
 from deepsleep.prompts.user import user_query_write

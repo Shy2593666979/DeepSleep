@@ -12,8 +12,8 @@ class GoogleSearchInput(BaseModel):
     query: str = Field(description='用户想要搜索的问题')
 
 class GoogleSearchTool(BaseTool):
-    name = 'google_search'
-    description = '使用搜索工具给用户进行搜索'
+    name: str = 'google_search'
+    description: str = '使用搜索工具给用户进行搜索'
     args_schema: Type[BaseModel] = GoogleSearchInput
 
     def _run(self, query: str):

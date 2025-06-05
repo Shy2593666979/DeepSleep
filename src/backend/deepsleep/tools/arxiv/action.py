@@ -10,8 +10,8 @@ class ArxivInput(BaseModel):
 
 
 class ArxivTool(BaseTool):
-    name = 'arxiv'
-    description = '为用户提供Arxiv上的论文'
+    name: str = 'arxiv'
+    description: str = '为用户提供Arxiv上的论文'
     args_schema: Type[BaseModel] = ArxivInput
 
     def _run(self, query: str):

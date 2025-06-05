@@ -13,8 +13,8 @@ class WeatherInput(BaseModel):
 
 
 class WeatherTool(BaseTool):
-    name = 'weather'
-    description = '帮助用户想要查询的天气'
+    name: str = 'weather'
+    description: str = '帮助用户想要查询的天气'
     args_schema: Type[BaseModel] = WeatherInput
 
     def _run(self, location: str):

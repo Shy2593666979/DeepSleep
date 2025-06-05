@@ -4,7 +4,12 @@ from datetime import datetime
 from uuid import uuid4
 import pytz
 
-class ToolTable(SQLModel, table=True):
+from deepsleep.database.models.base import SQLModelSerializable
+
+
+class ToolTable(SQLModelSerializable, table=True):
+    __tablename__ = "tool"
+
     tool_id: str = Field(default_factory=lambda: uuid4().hex, primary_key=True)
     zh_name: str = Field(description='工具的中文名称，显示给用户')
     en_name: str = Field(description='工具的英文名称，大模型调用')

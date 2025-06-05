@@ -1,6 +1,6 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
+![img.png](img.png)
 - [欢迎来到 智言平台](#%E6%AC%A2%E8%BF%8E%E6%9D%A5%E5%88%B0-%E6%99%BA%E8%A8%80%E5%B9%B3%E5%8F%B0)
   - [成果图](#%E6%88%90%E6%9E%9C%E5%9B%BE)
     - [智言平台首页](#%E6%99%BA%E8%A8%80%E5%B9%B3%E5%8F%B0%E9%A6%96%E9%A1%B5)
@@ -95,8 +95,10 @@ DeepSleep 是一个开源的智能体交流与开发平台，让更多的AIGC爱
 
 **2.启动**
 
-```
-python main.py
+在DeepSleep\src\backend目录下执行启动命令
+
+```shell
+uvicorn deepsleep.main:app --port 7860 --host 0.0.0.0
 ```
 
 ### 三、启动前端

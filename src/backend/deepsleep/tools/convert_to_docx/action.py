@@ -13,8 +13,8 @@ class ConvertDocxInput(BaseModel):
     file_path: str = Field(description='用户上传的文件路径')
 
 class ConvertDocxTool(BaseTool):
-    name = 'convert_to_docx'
-    description = '将用户上传的文件解析成Docx'
+    name: str = 'convert_to_docx'
+    description: str = '将用户上传的文件解析成Docx'
     args_schema: Type[BaseModel] = ConvertDocxInput
 
     def _run(self, file_path):

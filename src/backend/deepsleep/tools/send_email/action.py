@@ -14,8 +14,8 @@ class EmailInput(BaseModel):
     password: str = Field(description='发送人邮箱的授权码')
 
 class SendEmailTool(BaseTool):
-    name = 'send_email'
-    description = '帮助用户发送邮件'
+    name: str = 'send_email'
+    description: str = '帮助用户发送邮件'
     args_schema: Type[BaseModel] = EmailInput
 
     def _run(self, sender: str, receiver: str, email_message: str, password: str):

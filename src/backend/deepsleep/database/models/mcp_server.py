@@ -3,11 +3,13 @@ from typing import Optional
 from sqlalchemy import Column, VARCHAR, JSON, text, DateTime
 from sqlmodel import SQLModel, Field
 from datetime import datetime
-from uuid import uuid4
+from uuid import uuid4, UUID
+from deepsleep.database.models.base import SQLModelSerializable
 import pytz
 
-class MCPServerStdioTable(SQLModel, table=True):
+class MCPServerStdioTable(SQLModelSerializable, table=True):
     __tablename__ = "mcp_stdio_server"
+
     mcp_server_id: str = Field(default_factory=lambda: uuid4().hex, primary_key=True)
     mcp_server_path: str = Field(description="MCP Server脚本所在位置")
     mcp_server_command: str = Field(description="MCP Server脚本执行命令, python or npx ...")
@@ -16,8 +18,11 @@ class MCPServerStdioTable(SQLModel, table=True):
     name: str = Field(default="MCP Server", description="MCP Server名称")
     create_time: datetime = Field(default_factory=lambda: datetime.now(pytz.timezone('Asia/Shanghai')))
 
-class MCPServerTable(SQLModel, table=True):
+
+
+class MCPServerTable(SQLModelSerializable, table=True):
     __tablename__ = "mcp_server"
+
     mcp_server_id: str = Field(default_factory=lambda: uuid4().hex, primary_key=True)
     mcp_server_name: str = Field(default="MCP Server", description="MCP Server名称")
     user_id: str = Field(description='MCP Server对应的创建用户')

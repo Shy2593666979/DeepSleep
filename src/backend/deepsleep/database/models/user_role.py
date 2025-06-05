@@ -21,6 +21,7 @@ class UserRoleBase(SQLModel):
 
 
 class UserRole(UserRoleBase, table=True):
+    __tablename__ = "user_role"
     id: Optional[str] = Field(default=None, primary_key=True)
 
 

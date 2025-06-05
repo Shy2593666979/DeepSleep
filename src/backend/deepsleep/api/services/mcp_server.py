@@ -33,7 +33,7 @@ class MCPService:
     def get_server_from_tool_name(cls, tool_name):
         try:
             results = MCPServerDao.get_server_from_tool_name(tool_name)
-            return [res.to_dict() for res in results]
+            return [res[0].to_dict() for res in results]
         except Exception as err:
             raise ValueError(f"Get Server From Tool Name Error: {err}")
 
@@ -50,7 +50,6 @@ class MCPService:
             personal_servers = MCPServerDao.get_mcp_servers(user_id)
             admin_servers = MCPServerDao.get_mcp_servers(SystemUser)
             all_servers = personal_servers + admin_servers
-
-            return [server.to_dict() for server in all_servers]
+            return [server[0].to_dict() for server in all_servers]
         except Exception as err:
             raise ValueError(f"Get All Servers Error: {err}")

@@ -69,5 +69,5 @@ class MCPServerDao:
     def get_mcp_servers(cls, user_id):
         with Session(engine) as session:
             sql = select(MCPServerTable).where(MCPServerTable.user_id == user_id)
-            results = session.exec(sql).all()
-            return results
+            results = session.exec(sql)
+            return results.all()

@@ -221,7 +221,7 @@ class MilvusClient:
     # 获取单机Host中所有的集合
     def _get_collection(self):
         collections = {}
-        for collection in Collection.list_collections():
+        for collection in utility.list_collections():
             collections[collection] = Collection(collection)
         return collections
 

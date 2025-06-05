@@ -4,7 +4,7 @@ import asyncio
 from deepsleep.schema.chunk import ChunkModel
 from deepsleep.services.rag.doc_split.text import text_parser
 from deepsleep.services.rag.doc_split.markdown import markdown_parser
-from deepsleep.core.models import async_client
+from deepsleep.core.models.models import async_client
 
 
 class DocParser:

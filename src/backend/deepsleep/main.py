@@ -12,8 +12,8 @@ from deepsleep.settings import app_settings
 
 
 def register_router(app: FastAPI):
-    from api.router import router
-    app.mount("/img", StaticFiles(directory="data/img"), name="img")
+    from deepsleep.api.router import router
+    app.mount("/img", StaticFiles(directory="deepsleep/data/img"), name="img")
     app.include_router(router)
 
 
@@ -35,7 +35,7 @@ def init_config():
     initialize_app_settings()
 
     # 必须放到init settings 之后 import
-    from database.init_data import init_database, init_default_agent
+    from deepsleep.database.init_data import init_database, init_default_agent
     init_database()
     init_default_agent()
 
@@ -45,7 +45,7 @@ def create_app():
     app = FastAPI(title=app_settings.server.get('project_name'),
                   version=app_settings.server.get('version'))
 
-    from api.JWT import Settings
+    from deepsleep.api.JWT import Settings
 
     register_router(app)
     register_middleware(app)

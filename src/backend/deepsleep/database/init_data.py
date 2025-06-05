@@ -8,6 +8,7 @@ from deepsleep.api.services.agent import AgentService
 from loguru import logger
 from deepsleep.api.services.llm import LLMService
 from deepsleep.api.services.tool import ToolService
+from deepsleep.api.services.knowledge import KnowledgeService
 from deepsleep.settings import app_settings
 
 
@@ -45,10 +46,11 @@ def insert_agent_to_mysql():
                                   description=tool.description,
                                   user_id=SystemUser,
                                   llm_id=llm.llm_id,
-                                  tool_id=[tool.tool_id],
+                                  tools_id=[tool.tool_id],
                                   knowledges_id=[],
                                   logo=app_settings.logo.get('agent'),
-                                  is_custom=False)
+                                  is_custom=False,
+                                  mcp_ids=[])
 
 
 # 认定OS下有一个默认LLM API KEY
@@ -75,7 +77,7 @@ def insert_tools_to_mysql():
                                 description=description, user_id=SystemUser)
 
 def load_default_tool():
-    with open('./data/tool.json', 'r', encoding='utf-8') as f:
+    with open('./deepsleep/data/tool.json', 'r', encoding='utf-8') as f:
         result = json.load(f)
     return result
 

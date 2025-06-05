@@ -29,7 +29,7 @@ app_settings = Settings()
 def initialize_app_settings(file_path: str = None):
     global app_settings
 
-    file_path = file_path or "config.yaml"
+    file_path = file_path or "deepsleep/config.yaml"
     try:
         with open(file_path, 'r') as f:
             data = yaml.safe_load(f)

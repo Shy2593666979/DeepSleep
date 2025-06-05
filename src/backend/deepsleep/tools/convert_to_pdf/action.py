@@ -13,8 +13,8 @@ class ConvertPdfInput(BaseModel):
     file_path: str = Field(description='用户上传的文件路径')
 
 class ConvertPdfTool(BaseTool):
-    name = 'convert_to_pdf'
-    description = '将用户上传的文件解析成PDF'
+    name: str = 'convert_to_pdf'
+    description: str = '将用户上传的文件解析成PDF'
     args_schema: Type[BaseModel] = ConvertPdfInput
 
     def _run(self, file_path):

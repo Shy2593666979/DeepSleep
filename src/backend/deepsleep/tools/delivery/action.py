@@ -13,8 +13,8 @@ class DeliveryInput(BaseModel):
     delivery_number: str = Field(description='用户输入的快递单号')
 
 class DeliveryTool(BaseTool):
-    name = 'delivery'
-    description = '用来查询用户的快递物流信息'
+    name: str = 'delivery'
+    description: str = '用来查询用户的快递物流信息'
     args_schema: Type[BaseModel] = DeliveryInput
 
     def _run(self, delivery_number: str):

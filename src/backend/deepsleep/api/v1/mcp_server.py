@@ -13,7 +13,7 @@ router = APIRouter()
 async def create_mcp_server(mcp_server_name: str = Body(..., description="MCP Server的名称"),
                             url: str = Body(..., description="MCP Server 的URL"),
                             type: str = Body(..., description="MCP Server 的连接方式，SSE、Websocket"),
-                            config: str = Body(..., description="MCP Server 的配置信息"),
+                            config: str = Body({}, description="MCP Server 的配置信息"),
                             login_user: UserPayload = Depends(get_login_user)):
     try:
         mcp_manager = MCPManager()
@@ -24,12 +24,12 @@ async def create_mcp_server(mcp_server_name: str = Body(..., description="MCP Se
         }
         await mcp_manager.connect_mcp_servers([server_info])
         tools_params = await mcp_manager.show_mcp_tools()
-        tools_str = []
-        for key, tools in tools_params:
+        tools_name_str = []
+        for key, tools in tools_params.items():
             for tool in tools:
-                tools_str.append(tool["name"])
+                tools_name_str.append(tool["name"])
         MCPService.create_mcp_server(mcp_server_name, login_user.user_id, login_user.user_name,
-                                     url, type, config, ",".join(tools_str), tools_params)
+                                     url, type, config, ",".join(tools_name_str), tools_params)
         return resp_200()
     except Exception as err:
         logger.error(err)

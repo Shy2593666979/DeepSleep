@@ -9,7 +9,7 @@ class AgentService:
 
     @classmethod
     def create_agent(cls, name: str, description: str, logo: str, user_id: str, knowledges_id: List[str],
-                     llm_id: str, tools_id: List[str], use_embedding: bool, mcp_ids: List[str], is_custom: bool = True):
+                     llm_id: str, tools_id: List[str], mcp_ids: List[str], use_embedding: bool = False, is_custom: bool = True):
         try:
             agent_id = AgentDao.create_agent(name=name,
                                              description=description,
